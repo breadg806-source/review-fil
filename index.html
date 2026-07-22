@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIL Reviewer — Practice Exam</title>
+<style>
+  :root{
+    --paper:#f6f1e7;
+    --card:#fffdf8;
+    --ink:#1f2a24;
+    --maroon:#7a1f2b;
+    --maroon-dark:#5c1520;
+    --gold:#b8862b;
+    --green-ok:#2e6b45;
+    --red-no:#a83232;
+    --line:#e3d9c4;
+    --muted:#7a7364;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(122,31,43,0.05), transparent 40%),
+      radial-gradient(circle at 90% 10%, rgba(184,134,43,0.06), transparent 40%);
+    font-family: 'Iowan Old Style','Georgia', 'Palatino Linotype', serif;
+    color:var(--ink);
+  }
+  .masthead{
+    background: linear-gradient(180deg, var(--maroon) 0%, var(--maroon-dark) 100%);
+    color:#f6f1e7;
+    padding:28px 20px 22px;
+    text-align:center;
+    border-bottom:6px solid var(--gold);
+    position:relative;
+  }
+  .masthead::before, .masthead::after{
+    content:"";
+    position:absolute;
+    top:0; bottom:0;
+    width:6px;
+    background: repeating-linear-gradient(45deg, var(--gold) 0 6px, transparent 6px 12px);
+    opacity:.5;
+  }
+  .masthead::before{left:0;}
+  .masthead::after{right:0;}
+  .masthead h1{
+    margin:0;
+    font-size:clamp(28px,4vw,42px);
+    letter-spacing:3px;
+    font-weight:700;
+    text-transform:uppercase;
+  }
+  .masthead p{
+    margin:8px 0 0;
+    font-family:'Trebuchet MS', sans-serif;
+    letter-spacing:2px;
+    font-size:12px;
+    text-transform:uppercase;
+    color:#e7d9b8;
+  }
+  .wrap{
+    max-width:820px;
+    margin:0 auto;
+    padding:28px 18px 60px;
+  }
+
+  /* Name gate */
+  .name-gate{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:5px solid var(--maroon);
+    border-radius:10px;
+    padding:26px 24px;
+    margin-bottom:22px;
+    text-align:center;
+  }
+  .name-gate h2{
+    margin:0 0 6px;
+    font-size:22px;
+    color:var(--maroon-dark);
+  }
+  .name-gate p{
+    font-family:'Trebuchet MS', sans-serif;
+    color:var(--muted);
+    font-size:14px;
+    margin:0 0 16px;
+  }
+  .name-gate input{
+    width:100%;
+    max-width:320px;
+    padding:11px 14px;
+    font-size:16px;
+    font-family:'Trebuchet MS', sans-serif;
+    border:1.5px solid var(--line);
+    border-radius:7px;
+    background:#fffefb;
+    color:var(--ink);
+    text-align:center;
+  }
+  .name-gate input:focus{
+    outline:none;
+    border-color:var(--maroon);
+    box-shadow:0 0 0 3px rgba(122,31,43,0.12);
+  }
+  .name-gate button{
+    margin-top:14px;
+  }
+  .quiz-area{
+    display:none;
+  }
+  .quiz-area.show{display:block;}
+
+  .toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px 18px;
+    margin-bottom:22px;
+    font-family:'Trebuchet MS', sans-serif;
+    box-shadow:0 1px 0 rgba(0,0,0,0.02);
+  }
+  .toolbar .info{
+    font-size:13px;
+    color:var(--muted);
+  }
+  .score-badge{
+    font-weight:700;
+    font-size:15px;
+    color:var(--maroon-dark);
+  }
+  button{
+    font-family:'Trebuchet MS', sans-serif;
+    font-weight:700;
+    letter-spacing:.5px;
+    border:none;
+    border-radius:7px;
+    padding:11px 20px;
+    cursor:pointer;
+    font-size:14px;
+    transition:transform .08s ease, box-shadow .12s ease;
+  }
+  button:active{transform:translateY(1px);}
+  .btn-check{
+    background:var(--maroon);
+    color:#fff;
+  }
+  .btn-check:hover{background:var(--maroon-dark);}
+  .btn-reset{
+    background:transparent;
+    color:var(--maroon-dark);
+    border:1.5px solid var(--maroon-dark);
+  }
+  .btn-reset:hover{background:#f1e6e0;}
+  .qcard{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:5px solid var(--gold);
+    border-radius:10px;
+    padding:16px 18px 14px;
+    margin-bottom:14px;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .qcard.correct{
+    border-left-color:var(--green-ok);
+    background:#f3f9f4;
+  }
+  .qcard.incorrect{
+    border-left-color:var(--red-no);
+    background:#fbf2f1;
+  }
+  .qnum{
+    font-family:'Trebuchet MS', sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:1px;
+    color:var(--gold);
+    text-transform:uppercase;
+  }
+  .qtext{
+    font-size:17px;
+    line-height:1.55;
+    margin:6px 0 10px;
+  }
+  .qtext .blank-fill{
+    font-weight:700;
+    border-bottom:2px solid var(--ink);
+    padding:0 2px;
+  }
+  input.answer{
+    width:100%;
+    max-width:320px;
+    padding:9px 12px;
+    font-size:15px;
+    font-family:'Trebuchet MS', sans-serif;
+    border:1.5px solid var(--line);
+    border-radius:6px;
+    background:#fffefb;
+    color:var(--ink);
+  }
+  input.answer:focus{
+    outline:none;
+    border-color:var(--maroon);
+    box-shadow:0 0 0 3px rgba(122,31,43,0.12);
+  }
+  .feedback{
+    font-family:'Trebuchet MS', sans-serif;
+    font-size:13px;
+    margin-top:8px;
+    font-weight:600;
+  }
+  .feedback.correct{color:var(--green-ok);}
+  .feedback.incorrect{color:var(--red-no);}
+  .feedback .correct-answer{
+    font-weight:700;
+    text-decoration:underline;
+  }
+  .feedback .praise{
+    display:block;
+    margin-top:2px;
+    font-style:italic;
+  }
+  .results{
+    display:none;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:22px;
+    text-align:center;
+    margin-bottom:24px;
+    font-family:'Trebuchet MS', sans-serif;
+  }
+  .results.show{display:block;}
+  .results .big-score{
+    font-family: 'Iowan Old Style','Georgia', serif;
+    font-size:44px;
+    font-weight:700;
+    color:var(--maroon-dark);
+    margin:4px 0;
+  }
+  .results .remark{
+    font-size:14px;
+    color:var(--muted);
+  }
+  .score-breakdown{
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    margin:10px 0 12px;
+    flex-wrap:wrap;
+  }
+  .score-breakdown .pill{
+    font-size:14px;
+    font-weight:700;
+    padding:7px 16px;
+    border-radius:999px;
+  }
+  .score-breakdown .pill.right{
+    background:#e7f4ea;
+    color:var(--green-ok);
+  }
+  .score-breakdown .pill.wrong{
+    background:#fbe9e7;
+    color:var(--red-no);
+  }
+  .sticky-actions{
+    position:sticky;
+    bottom:0;
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    padding:16px 0 4px;
+    background:linear-gradient(180deg, rgba(246,241,231,0) 0%, var(--paper) 30%);
+  }
+  @media (max-width:520px){
+    .masthead h1{letter-spacing:1.5px;}
+    input.answer{max-width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <h1>FIL Reviewer</h1>
+  <p>Punan ang Patlang &middot; Practice Exam &middot; 50 Aytem</p>
+</div>
+
+<div class="wrap">
+
+  <div class="name-gate" id="nameGate">
+    <h2>Sino ang sasagot ngayon?</h2>
+    <p>Ilagay ang iyong pangalan bago simulan ang pagsusulit.</p>
+    <input type="text" id="playerName" placeholder="Pangalan mo dito..." autocomplete="off">
+    <br>
+    <button class="btn-check" id="startBtn">Simulan ang Pagsusulit</button>
+  </div>
+
+  <div class="quiz-area" id="quizArea">
+
+    <div class="toolbar">
+      <div class="info" id="greeting">Sagutan ang bawat patlang, pagkatapos pindutin ang <strong>Suriin ang mga Sagot</strong>.</div>
+      <div class="score-badge" id="liveCounter">0 / 50 nasagutan</div>
+    </div>
+
+    <div class="results" id="resultsBox">
+      <div style="font-family:'Trebuchet MS',sans-serif; font-size:13px; letter-spacing:1px; color:var(--muted); text-transform:uppercase;">Iskor</div>
+      <div class="big-score" id="finalScore">0 / 50</div>
+      <div class="score-breakdown" id="scoreBreakdown"></div>
+      <div class="remark" id="finalRemark"></div>
+    </div>
+
+    <div id="questionList"></div>
+
+    <div class="sticky-actions">
+      <button class="btn-check" id="checkBtn">Suriin ang mga Sagot</button>
+      <button class="btn-reset" id="resetBtn">I-reset</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {q:"Ang CHED Memorandum Order No. 20 ay bahagi ng serye ng taong ______.", a:"2013"},
+  {q:"Ang CHED ay nangangahulugang Commission on ______ Education.", a:"Higher"},
+  {q:"Ang buong pamagat ng memorandum ay may kasamang \"Intellectual and ______ Competencies.\"", a:"Civic"},
+  {q:"Inilabas ang CHED Memo 20 noong Hunyo 28, ______.", a:"2013"},
+  {q:"Ayon sa memorandum, hindi na ituturo ang Filipino sa kolehiyo kapag naipatupad na ang programang ______.", a:"K-12", alt:["k12","k 12"]},
+  {q:"Ang General Education courses ay ipatutupad sa pagtuturo ng mga estudyanteng Grade 11 at Grade ______.", a:"12"},
+  {q:"Ang alyansa ng mga guro at propesor na nabuo bunga ng isyu sa CHED memo ay tinatawag na \"______ Wika.\"", a:"Tanggol"},
+  {q:"Noong taong ______, ipinasya ng CHED na payagan ang sinumang unibersidad na gustong magturo ng Filipino.", a:"2018"},
+  {q:"Si ______ ang pambansang alagad ng sining sa panitikan, manunulat, at kritiko na nagsabing ang wika ay palatandaan ng identidad ng isang bayan.", a:"Bienvenido Lumbera", alt:["lumbera","bienvenido lumbera"]},
+  {q:"Ang wikang Filipino ay ang pambansang wika na itinakda ng ______ ng Pilipinas.", a:"Konstitusyon"},
+  {q:"Ayon sa reviewer, ang wikang Filipino at panitikan ay mga ______ sa pagtataguyod ng katotohanan at katuwiran.", a:"sandata"},
+  {q:"Napakahalaga ng wikang Filipino sa pagpapalalim ng mapanuri, malikhain, malaya, at ______ na kakayahan ng mga mag-aaral.", a:"mapagpalayang"},
+  {q:"Sa tulong ng wikang Filipino, nagkakaroon ng pagkakabuklod-______ ang lahat ng mamamayan sa Pilipinas.", a:"buklod"},
+  {q:"Sa halimbawang TagalogBatangas, madalas nilang gamitin ang katagang \"______\" kapag nagsasalita.", a:"eh"},
+  {q:"Sa TagalogBatangas, ang \"Dine\" o \"Rine\" ay nangangahulugang ______.", a:"dito"},
+  {q:"Sa halimbawang ibinigay, ang \"Are\" ay nangangahulugang ______.", a:"ito"},
+  {q:"Ang wikang Filipino ay patuloy na umuunlad dahil nagagamit ito sa pagsusulat ng mga ______ na papel o pananaliksik.", a:"pamanahunang"},
+  {q:"Idineklara ni Pangulong ______ ang Tagalog bilang batayan ng wikang pambansa.", a:"Manuel L. Quezon", alt:["manuel quezon","quezon","manuel l quezon"]},
+  {q:"Idineklara ang Tagalog bilang batayan ng wikang pambansa noong Disyembre 30, ______.", a:"1937"},
+  {q:"Noong 1972, nabago ang tawag sa wikang pambansa sa ilalim ng panunungkulan ni Pangulong ______.", a:"Marcos", alt:["ferdinand marcos"]},
+  {q:"Opisyal na naging \"Filipino\" ang wikang pambansa noong Pebrero 2, ______.", a:"1987"},
+  {q:"Ang opisyal na paggamit ng \"Filipino\" bilang wikang pambansa ay batay sa Artikulo ______ ng 1987 Konstitusyon.", a:"XIV", alt:["14"]},
+  {q:"Si Bienvenido Lumbera ay kilala bilang \"Ama ng ______.\"", a:"Panitikan"},
+  {q:"Si Manuel L. Quezon ay kilala bilang \"Ama ng ______.\"", a:"Wika"},
+  {q:"Si William S. Gray ay kilala bilang \"Ama ng ______.\"", a:"Pagbasa"},
+  {q:"Ang wikang Filipino ay hinango sa wikang ______.", a:"Tagalog"},
+  {q:"Ayon kay Good (1993), ang panaliksik ay isang maingat, kritikal, at ______ na pagtatanong ng impormasyon.", a:"disiplinadong"},
+  {q:"Ayon kay Aquino (1994), ang pananaliksik ay sistematikong paghahanap at pagsusuri sa mga ______ na impormasyon.", a:"importanteng"},
+  {q:"Batay kina Manuel at Medel (1976), ang pananaliksik ay ginagawa upang masolusyonan ang problema sa paraang ______.", a:"siyentipiko"},
+  {q:"Para kina E. Trece at J. W. Trece (1993), ang pananaliksik ay pagsubok para makakuha ng mga sagot ng mga walang ______.", a:"katiyakan"},
+  {q:"Ayon kina Calderon at Gonzales (1993), kabilang sa pananaliksik ang pagbibigay ng ______ ng isang datos o impormasyon.", a:"kahulugan"},
+  {q:"Si ______ (1973) ang nagbigay ng depinisyon sa pananaliksik bilang sistematiko, kontrolado, at panigurado sa obserbasyon.", a:"Kerlinger"},
+  {q:"Sa pangkalahatan, ang pananaliksik ay may katangiang sistematiko, kontrolado, mapanuri, makatwiran, at ______.", a:"orihinal"},
+  {q:"Ang batis ng impormasyon ay tumutukoy sa pinanggagalingan o ______ ng datos.", a:"pinagkukunan"},
+  {q:"Ang batis na naglalaman ng impormasyong galing mismo sa bagay o taong pinag-uusapan sa kasaysayan ay tinatawag na ______ na Batis.", a:"Primaryang"},
+  {q:"Ang batis na ang impormasyon ay mula sa pangunahing batis ng kasaysayan ay tinatawag na ______ na Batis.", a:"Sekondaryang"},
+  {q:"Ang kasaysayang sinambit ng bibig ay tinatawag na \"______ na Kasaysayan.\"", a:"Pasalitang"},
+  {q:"Ang kasaysayang nagmula sa ating sariling lugar ay tinatawag na \"Kasaysayang ______.\"", a:"Lokal"},
+  {q:"Ang pagtingin o perspektibang mas pabor sa isang bansa ay tinatawag na \"______ Perspective.\"", a:"Nationalist"},
+  {q:"Ang pananaw na naglalayong kumuha ng kaalaman batay sa mga ordinaryong tao ay tinatawag na \"History From ______.\"", a:"Below"},
+  {q:"Ang metodo ng pagkilala sa kasaysayan at kalinangang Pilipino na nakabatay sa panloob na pagkakaugnay-ugnay ng iisang kabuuang pangkalinangan ay tinatawag na \"______ Pananaw.\"", a:"Pantayong"},
+  {q:"Ang \"Pangkaming Pananaw\" ay nagawa ng hanay ng mga ______ tulad nina Rizal at Luna.", a:"Propagandista"},
+  {q:"Sa perspektiba ng \"______ Pananaw,\" ipinagpapatuloy ng kasalukuyang mga antropologong Pilipino ang nasyonalidad ngunit hindi na sa kultura at wika.", a:"Pansilang"},
+  {q:"Ayon kina Recorba, Nacin, atbp. (2003), kapag tayo ay nagbabasa ay nakikipag-______ tayo sa awtor o may akda.", a:"komunikasyon"},
+  {q:"Ayon kina Garcia, Dupale atbp. (2012), ang pagbabasa ang pinaniniwalaang batis ng lahat ng ating kaalaman at ______.", a:"impormasyon"},
+  {q:"Ayon kay William Gray, ang unang proseso ng pagbabasa ay ang ______, ang pagbasa sa akda o pagkilala.", a:"Persepsyon"},
+  {q:"Ang ikalawang proseso ng pagbabasa ayon kay Gray ay ang ______, ang pag-unawa sa binasa.", a:"Komprehensyon"},
+  {q:"Ang pangatlong proseso ng pagbabasa ay ang ______, ang pagsasama-sama at pag-uugnay ng mga kaalaman mula sa binasa at sa dating karanasan.", a:"Asimilasyon"},
+  {q:"Ang pang-apat na proseso ng pagbabasa ay ang ______, ang pagpapakita ng hinuha sa binasa.", a:"Reaksyon"},
+  {q:"Ang pagbabasang nangangailangan ng maingat at masusing pagbasa upang lubos na maunawaan ang binabasa ay tinatawag na \"______ na Pagbasa.\"", a:"Matiim"},
+  {q:"Ang pagbabasang pansamantala lamang o hindi palagian, na ginagawa kadalasan kapag may inaantay o nagpapalipas ng oras, ay tinatawag na \"______.\"", a:"Kaswal"},
+  {q:"Ang pagbasang inaangkupan ng wastong pagbigkas ng mga salita at sapat na lakas ng tinig ay tinatawag na Pasalitang Pagbasa o \"______ Reading.\"", a:"Oral"},
+  {q:"Ang pagbasang ginagamitan ng matalino at malalim na pag-iisip, at pinupuna ang nilalaman, pamagat, simula, katawan, at wakas ng akda, ay tinatawag na Pagsusuring Pagbasa o \"______ Reading.\"", a:"Analytical"},
+  {q:"Ang pagbasang tumutukoy sa paghahanap ng isang tiyak na impormasyon sa isang pahina ay tinatawag na Pahapyaw na Pagbasa o \"______.\"", a:"Scanning"},
+  {q:"Ang pagbasang mata lamang ang ginagamit, kaya walang tunog ng salita ang nalilikha ng bumabasa, ay tinatawag na Tahimik na Pagbasa o \"______ Reading.\"", a:"Silent"},
+  {q:"Ang pag-uulit ng pagbasa upang maintindihan ang kabuuang diwa ng materyal na binabasa ay tinatawag na \"______\" o Muling Pagbasa.", a:"Re-reading", alt:["rereading","re reading"]},
+  {q:"Sa Previewing, ang unang tinitingnan ay ang pamagat, mga heading at ______, una at huling talata, mga buod, larawan, graps, at chart.", a:"subheading", alt:["subheadings"]},
+  {q:"Ang pagbabasang may kasamang paglilista ng mga mahalagang kaisipan o ideya bilang pag-iimbak ng impormasyon sa isipan ay tinatawag na \"______.\"", a:"Pagtatala"},
+  {q:"Ang pagbasang may layuning malaman ang impormasyon, gaya ng pagbasa sa pahayagan kung may bagyo, ay tinatawag na \"Pagbasang Pang-______.\"", a:"Impormasyon"},
+  {q:"Ayon sa reviewer, ang pagbubuod ay hindi mo maaaring samahan ng sarili mong opinyon, haka-haka, o ______.", a:"komento"}
+];
+
+let playerName = "";
+
+function normalize(str){
+  return str
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9 ]/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+function isCorrect(userInput, qObj){
+  const norm = normalize(userInput);
+  if(!norm) return false;
+  const candidates = [qObj.a, ...(qObj.alt || [])].map(normalize);
+  return candidates.includes(norm);
+}
+
+const nameGate = document.getElementById('nameGate');
+const quizArea = document.getElementById('quizArea');
+const playerNameInput = document.getElementById('playerName');
+const startBtn = document.getElementById('startBtn');
+const greeting = document.getElementById('greeting');
+
+const listEl = document.getElementById('questionList');
+const liveCounter = document.getElementById('liveCounter');
+const resultsBox = document.getElementById('resultsBox');
+const finalScore = document.getElementById('finalScore');
+const finalRemark = document.getElementById('finalRemark');
+
+function startQuiz(){
+  const typed = playerNameInput.value.trim();
+  playerName = typed !== "" ? typed : "Master";
+  nameGate.style.display = 'none';
+  quizArea.classList.add('show');
+  greeting.innerHTML = 'Kumusta, <strong>' + playerName + '</strong>! Sagutan ang bawat patlang, pagkatapos pindutin ang <strong>Suriin ang mga Sagot</strong>.';
+  render();
+}
+
+playerNameInput.addEventListener('keydown', e => {
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    startQuiz();
+  }
+});
+startBtn.addEventListener('click', startQuiz);
+
+function render(){
+  listEl.innerHTML = '';
+  questions.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.id = 'q' + idx;
+
+    const num = document.createElement('div');
+    num.className = 'qnum';
+    num.textContent = 'Tanong ' + (idx + 1) + ' ng ' + questions.length;
+
+    const text = document.createElement('div');
+    text.className = 'qtext';
+    text.innerHTML = item.q.replace('______', '<span class="blank-fill">______</span>');
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'answer';
+    input.placeholder = 'Isulat ang sagot dito...';
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+    input.addEventListener('input', updateLiveCounter);
+    input.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        const next = document.querySelectorAll('.answer')[idx+1];
+        if(next) next.focus(); else document.getElementById('checkBtn').click();
+      }
+    });
+
+    const feedback = document.createElement('div');
+    feedback.className = 'feedback';
+    feedback.id = 'fb' + idx;
+
+    card.appendChild(num);
+    card.appendChild(text);
+    card.appendChild(input);
+    card.appendChild(feedback);
+    listEl.appendChild(card);
+  });
+  updateLiveCounter();
+}
+
+function updateLiveCounter(){
+  const inputs = document.querySelectorAll('.answer');
+  let filled = 0;
+  inputs.forEach(i => { if(i.value.trim() !== '') filled++; });
+  liveCounter.textContent = filled + ' / ' + questions.length + ' nasagutan';
+}
+
+function checkAnswers(){
+  const inputs = document.querySelectorAll('.answer');
+  let score = 0;
+  let wrong = 0;
+  questions.forEach((item, idx) => {
+    const input = inputs[idx];
+    const card = document.getElementById('q' + idx);
+    const fb = document.getElementById('fb' + idx);
+    const correct = isCorrect(input.value, item);
+    card.classList.remove('correct','incorrect');
+    if(correct){
+      score++;
+      card.classList.add('correct');
+      fb.className = 'feedback correct';
+      fb.innerHTML = '✓ Tama! <span class="praise">Goodjob, ' + playerName + '!</span>';
+    } else {
+      wrong++;
+      card.classList.add('incorrect');
+      fb.className = 'feedback incorrect';
+      fb.innerHTML = '✗ Mali. Wastong sagot: <span class="correct-answer">' + item.a + '</span><span class="praise">More review, ' + playerName + '!</span>';
+    }
+  });
+
+  finalScore.textContent = score + ' / ' + questions.length;
+  document.getElementById('scoreBreakdown').innerHTML =
+    '<span class="pill right">✓ ' + score + ' tama</span>' +
+    '<span class="pill wrong">✗ ' + wrong + ' mali</span>';
+  const pct = Math.round((score / questions.length) * 100);
+  let remark = '';
+  if(pct === 100) remark = 'Perpekto, ' + playerName + '! Ganap mong naunawaan ang reviewer. Goodjob!';
+  else if(pct >= 80) remark = 'Napakahusay, ' + playerName + '! ' + pct + '% na tama. Goodjob!';
+  else if(pct >= 60) remark = 'Mahusay na simula, ' + playerName + ' — ' + pct + '%. More review, balikan ang mga maling sagot.';
+  else remark = pct + '% na tama, ' + playerName + '. More review muna bago subukan ulit.';
+  finalRemark.textContent = remark;
+  resultsBox.classList.add('show');
+  resultsBox.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function resetAll(){
+  document.querySelectorAll('.answer').forEach(i => i.value = '');
+  document.querySelectorAll('.qcard').forEach(c => c.classList.remove('correct','incorrect'));
+  document.querySelectorAll('.feedback').forEach(f => { f.textContent=''; f.className='feedback'; });
+  document.getElementById('scoreBreakdown').innerHTML = '';
+  resultsBox.classList.remove('show');
+  updateLiveCounter();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+document.getElementById('checkBtn').addEventListener('click', checkAnswers);
+document.getElementById('resetBtn').addEventListener('click', resetAll);
+</script>
+
+</body>
+</html>
